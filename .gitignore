@@ -1,0 +1,16 @@
+# Outil de travail : affiche la cible avec les zones, donc la solution du nœud 05.
+calibrage.html
+AR-INSTALLATION.md
+
+# Scan du faire-part : porte des données personnelles (noms, adresse, téléphones).
+# Le site n'en a pas besoin à l'exécution, seul le .mind compilé est servi.
+assets/faire-part.jpg
+
+# Divers
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Maquettes internes du design system : sans usage pour le site,
+# et elles reprennent des textes de jeu. A retirer si tu veux les versionner.
+design/

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#05080F">
+<title>NORDLYS · LA CIRE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Cinzel:wght@700&family=Source+Serif+4:ital@0;1&display=swap" rel="stylesheet">
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:#05080F;color:#E9EFF3;font-family:'JetBrains Mono',monospace;overflow:hidden;-webkit-text-size-adjust:100%}
+.aur{position:fixed;border-radius:50%;filter:blur(70px);pointer-events:none}
+.a1{width:80vw;height:38vh;left:-18vw;top:-14vh;background:radial-gradient(ellipse at center,#5EE0A0,transparent 62%);opacity:.17}
+.a2{width:70vw;height:34vh;right:-16vw;bottom:-10vh;background:radial-gradient(ellipse at center,#8F7BEA,transparent 62%);opacity:.13}
+.vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 76% 70% at 50% 46%,transparent 0%,rgba(5,8,15,.45) 62%,rgba(4,6,12,.88) 100%)}
+
+.scr{position:fixed;inset:0;display:none;flex-direction:column;justify-content:center;gap:22px;
+  padding:calc(30px + env(safe-area-inset-top)) 26px calc(30px + env(safe-area-inset-bottom));overflow-y:auto}
+.scr.on{display:flex}
+.kick{font-size:10px;letter-spacing:.4em;color:#5EE0A0;opacity:.85}
+h1{font-family:'Cinzel',serif;font-size:27px;letter-spacing:.22em;margin:6px 0 0;color:#E9EFF3;text-shadow:0 0 26px rgba(94,224,160,.4);font-weight:700}
+.txt{font-family:'Source Serif 4',serif;font-style:italic;font-size:17px;line-height:1.55;color:#C9D6E2;text-wrap:pretty}
+.txt p{margin:0 0 12px}
+button{background:none;border:1px solid #5EE0A0;color:#5EE0A0;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;padding:16px 20px;cursor:pointer;width:100%;transition:background .3s,box-shadow .3s}
+button:active{background:rgba(94,224,160,.16)}
+.link{background:none;border:none;color:#5B6C82;font-family:'Source Serif 4',serif;font-style:italic;font-size:14px;letter-spacing:0;padding:8px 0;text-decoration:underline;text-underline-offset:3px;width:auto;align-self:center}
+.note{font-size:10px;letter-spacing:.24em;color:#5B6C82;line-height:1.8}
+.warn{border:1px solid #4A3226;background:rgba(74,50,38,.28);padding:13px 15px;font-family:'Source Serif 4',serif;font-style:italic;font-size:14.5px;line-height:1.5;color:#E4C7A8}
+.hidden{display:none!important}
+.steps{font-family:'Source Serif 4',serif;font-style:italic;font-size:16px;line-height:1.55;color:#9AA9BC;border-left:1px solid #22304D;padding-left:16px}
+.steps strong{display:block;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:10.5px;letter-spacing:.16em;line-height:1.7;color:#C9D6E2;font-weight:400;margin-bottom:9px}
+.steps ol{margin:0;padding-left:20px}
+.steps li{margin-bottom:7px}
+
+/* --- écran de réalité augmentée --- */
+.ar{position:fixed;inset:0;background:#05080F;display:none;overflow:hidden}
+.ar.on{display:block}
+.arview{position:absolute;inset:0}
+.arview video,.arview canvas{position:absolute;top:0;left:0}
+.arui{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;
+  padding:calc(13px + env(safe-area-inset-top)) 13px calc(15px + env(safe-area-inset-bottom))}
+.arui>*{pointer-events:auto}
+.arx{align-self:flex-end;width:auto;background:rgba(10,16,32,.74);border:1px solid #22304D;color:#9AA9BC;font-size:15px;line-height:1;padding:12px 15px;letter-spacing:0}
+.arhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(86%,330px);text-align:center;
+  font-family:'Source Serif 4',serif;font-style:italic;font-size:16.5px;line-height:1.45;color:#E9EFF3;
+  text-shadow:0 2px 16px rgba(0,0,0,.95);transition:opacity .5s ease;pointer-events:none}
+.arhint.gone{opacity:0}
+.ardone{align-self:stretch;text-align:center;background:rgba(10,16,32,.82);border:1px solid #22304D;padding:14px 16px;
+  font-family:'Source Serif 4',serif;font-style:italic;font-size:15.5px;line-height:1.5;color:#E9EFF3;
+  opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+.ardone.show{opacity:1;transform:none}
+.ardone b{display:block;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:10px;letter-spacing:.3em;color:#5EE0A0;margin-bottom:7px;font-weight:400}
+.arload{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  background:#0A1020;color:#9AA9BC;font-size:10.5px;letter-spacing:.3em;line-height:1.9;text-align:center;padding:28px}
+.arload[hidden]{display:none}
+.spin{width:34px;height:34px;border:1px solid #22304D;border-top-color:#5EE0A0;border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.6s}}
+</style>
+</head>
+<body>
+<div class="aur a1"></div><div class="aur a2"></div><div class="vig"></div>
+
+<div class="scr on" id="s1">
+  <div>
+    <div class="kick">ÉPREUVE 05 · LA CIRE</div>
+    <h1>LA CIRE</h1>
+  </div>
+  <div class="txt">
+    <p>Sortez le carton et posez-le à plat, bien éclairé.</p>
+    <p>Braquez la caméra dessus : ce que vos invités y ont lu n’était pas tout.</p>
+  </div>
+  <div class="warn hidden" id="inapp">Cette page est ouverte dans le navigateur d’une application, qui bloque la caméra. Ouvrez-la dans Safari ou Chrome.</div>
+  <div>
+    <button id="go">OUVRIR LA CAMÉRA</button>
+    <button class="link" id="fb">La caméra ne veut pas</button>
+  </div>
+  <div class="note">AUCUNE IMAGE NE QUITTE VOTRE TÉLÉPHONE</div>
+</div>
+
+<div class="scr" id="s2">
+  <div>
+    <div class="kick">ÉPREUVE 05 · SANS CAMÉRA</div>
+    <h1>À LA MAIN</h1>
+  </div>
+  <div class="steps" id="steps"></div>
+  <div class="txt" style="font-size:15.5px">Les cinq lettres, mises bout à bout, forment le mot à graver sur l’ordinateur.</div>
+  <button class="link" id="back">Revenir en arrière</button>
+</div>
+
+<div class="ar" id="ar">
+  <div class="arview" id="arview"></div>
+  <div class="arui">
+    <button class="arx" id="arx">✕</button>
+    <div class="arhint" id="arhint">Tenez le carton entier dans le cadre.</div>
+    <div class="ardone" id="ardone"><b>LES CINQ LETTRES SONT LÀ</b>Lisez-les dans l’ordre des numéros, puis retournez à l’ordinateur pour graver le mot.</div>
+  </div>
+  <div class="arload" id="arload" hidden><div class="spin"></div><div id="arloadt">OUVERTURE DE L’ŒIL…</div></div>
+</div>
+
+<script>
+'use strict';
+
+/* repère de la cible : coin haut-gauche = 0,0 · coin bas-droit = 1,1 */
+const TR=1.46582;
+/* 5e valeur : pastille sous le cadre au lieu d'au-dessus, quand une autre zone occupe le dessus */
+const ZN=[
+  [0.462,0.6301,0.09,0.024],
+  [0.6117,0.7341,0.082,0.023],
+  [0.443,0.9527,0.03,0.019],
+  [0.6413,0.763,0.055,0.022,1],
+  [0.6735,0.6011,0.0755,0.0259],
+];
+const STEP=350, RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const $=id=>document.getElementById(id);
+const s1=$('s1'),s2=$('s2'),arEl=$('ar'),hint=$('arhint'),done=$('ardone'),load=$('arload'),loadt=$('arloadt');
+
+/* --- écran sans caméra --- */
+$('steps').innerHTML='<strong>Le carton porte cinq mots. De chacun, ne gardez que la première lettre, dans cet ordre.</strong>'+
+  '<ol><li>Sous la coupe, le second mot.</li>'+
+  '<li>Le nom du lieu — celui qui revient deux fois.</li>'+
+  '<li>Le premier mot de la toute dernière ligne.</li>'+
+  '<li>Dans l’adresse, le mot qui suit « Grande ».</li>'+
+  '<li>Sous le gâteau, le premier mot.</li></ol>';
+const show=el=>{[s1,s2].forEach(x=>x.classList.toggle('on',x===el))};
+$('fb').onclick=()=>show(s2);
+$('back').onclick=()=>show(s1);
+
+/* --- garde-fous --- */
+if(/FBAN|FBAV|Instagram|Line\/|LinkedInApp|Twitter/i.test(navigator.userAgent))$('inapp').classList.remove('hidden');
+const canCam=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)&&window.isSecureContext;
+if(!canCam){$('go').disabled=true;$('go').textContent='CAMÉRA INDISPONIBLE';show(s2)}
+
+/* --- halos --- */
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+
+/* pt/pb : la plus large des deux marges loge la pastille du numéro, qui borde
+   le mot sans jamais recouvrir sa première lettre */
+function paint(k,zw,zh,px,pt,pb,below){
+  const W=zw+2*px,H=zh+pt+pb;
+  const c=document.createElement('canvas');
+  const w=Math.max(128,Math.min(1024,Math.round(W*1200)));
+  c.width=w;c.height=Math.max(64,Math.round(w*H/W));
+  const g=c.getContext('2d'),s=c.width/W;
+  const rx=px*s,ry=pt*s,rw=zw*s,rh=zh*s,rad=Math.min(rw,rh)*.24;
+  g.fillStyle='rgba(94,224,160,.28)';
+  g.shadowColor='rgba(94,224,160,.9)';g.shadowBlur=px*s*1.4;
+  rr(g,rx,ry,rw,rh,rad);g.fill();
+  g.shadowBlur=0;rr(g,rx,ry,rw,rh,rad);g.fill();
+  g.lineWidth=Math.max(2,rh*.06);g.strokeStyle='rgba(94,224,160,.95)';
+  rr(g,rx,ry,rw,rh,rad);g.stroke();
+  const d=rh*.9,bx=rx+d/2,by=below?ry+rh+d/2:ry-d/2;
+  g.beginPath();g.arc(bx,by,d/2,0,7);g.fillStyle='#8F7BEA';g.fill();
+  g.lineWidth=Math.max(1.5,d*.07);g.strokeStyle='rgba(8,13,26,.92)';g.stroke();
+  g.fillStyle='#0A0620';g.textAlign='center';g.textBaseline='middle';
+  g.font='600 '+(d*.6).toFixed(0)+"px 'JetBrains Mono',monospace";
+  g.fillText(String(k+1),bx,by+d*.03);
+  return c;
+}
+
+/* --- la scène --- */
+let mindar=null,busy=false,CL=[],posed=false,poseT=null;
+
+async function start(){
+  if(busy)return;busy=true;
+  arEl.classList.add('on');load.hidden=false;loadt.textContent='OUVERTURE DE L’ŒIL…';
+  try{
+    try{await document.fonts.ready}catch(e){}
+    const THREE=await import('three');
+    const {MindARThree}=await import('https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js');
+    loadt.textContent='LECTURE DU SCEAU…';
+    mindar=new MindARThree({
+      container:$('arview'),
+      imageTargetSrc:'assets/faire-part.mind',
+      uiLoading:'no',uiScanning:'no',uiError:'no',
+      maxTrack:1,
+      filterMinCF:0.0001,   // lissage fort : la cible est posée, on préfère la stabilité à la réactivité
+      filterBeta:600,
+      missTolerance:8,warmupTolerance:5,
+    });
+    const {renderer,scene,camera}=mindar;
+    const anchor=mindar.addAnchor(0);
+
+    ZN.forEach((z,k)=>{
+      const zw=z[2],zh=z[3]*TR,px=zh*.55,lo=!!z[4],pt=zh*(lo?.55:1.15),pb=zh*(lo?1.15:.55);
+      const t=new THREE.CanvasTexture(paint(k,zw,zh,px,pt,pb,lo));
+      if('SRGBColorSpace' in THREE)t.colorSpace=THREE.SRGBColorSpace;
+      t.anisotropy=4;
+      const mat=new THREE.MeshBasicMaterial({map:t,transparent:true,opacity:0,depthTest:false,depthWrite:false});
+      const m=new THREE.Mesh(new THREE.PlaneGeometry(zw+2*px,zh+pt+pb),mat);
+      // le plan est plus haut que large côté marge : on recentre sur le mot, pas sur le plan
+      m.position.set(z[0]+z[2]/2-.5,(.5-(z[1]+z[3]/2))*TR+(pt-pb)/2,.001+k*.0004);
+      m.renderOrder=10+k;
+      anchor.group.add(m);
+      CL.push({m:m,mat:mat,t0:null});
+    });
+
+    anchor.onTargetFound=()=>{
+      hint.classList.add('gone');
+      const now=performance.now(),gap=posed?0:STEP;
+      CL.forEach((c,k)=>c.t0=now+k*gap);
+      if(!posed){clearTimeout(poseT);poseT=setTimeout(()=>{posed=true;done.classList.add('show')},CL.length*STEP+520)}
+      else done.classList.add('show');
+    };
+    anchor.onTargetLost=()=>{
+      hint.classList.remove('gone');
+      CL.forEach(c=>c.t0=null);
+      clearTimeout(poseT);
+      done.classList.remove('show');
+    };
+
+    renderer.setAnimationLoop(()=>{
+      const now=performance.now();
+      for(let k=0;k<CL.length;k++){
+        const c=CL[k];
+        if(c.t0===null){c.mat.opacity=0;continue}
+        const e=(now-c.t0)/420;
+        if(e<=0){c.mat.opacity=0;continue}
+        const p=Math.min(1,e),o=1-Math.pow(1-p,3);
+        if(RM||e<1){
+          c.mat.opacity=o*.97;
+          c.m.scale.setScalar(RM?1:1.1-.1*p);
+        }else{
+          const w=now/1250+k*.9;
+          c.mat.opacity=.9+.09*Math.sin(w);
+          c.m.scale.setScalar(1+.02*Math.sin(w));
+        }
+      }
+      renderer.render(scene,camera);
+    });
+
+    await mindar.start();
+    load.hidden=true;
+  }catch(e){
+    fail(e);
+  }
+  busy=false;
+}
+
+function fail(e){
+  const n=(e&&e.name)||'';
+  let m;
+  if(n==='NotAllowedError'||n==='SecurityError')m='L’ACCÈS À LA CAMÉRA A ÉTÉ REFUSÉ.<br>AUTORISEZ-LE DANS LES RÉGLAGES DU NAVIGATEUR,<br>OU CONTINUEZ SANS CAMÉRA.';
+  else if(n==='NotFoundError'||n==='OverconstrainedError')m='AUCUNE CAMÉRA UTILISABLE SUR CET APPAREIL.';
+  else if(n==='NotReadableError')m='LA CAMÉRA EST DÉJÀ UTILISÉE PAR UNE AUTRE APPLICATION.';
+  else m='LE SCEAU N’A PAS PU ÊTRE CHARGÉ.<br>VÉRIFIEZ VOTRE CONNEXION.';
+  load.hidden=false;
+  load.innerHTML='<div style="max-width:300px">'+m+'</div>'+
+    '<button class="link" id="fail1">Continuer sans caméra</button>'+
+    '<button class="link" id="fail2">Réessayer</button>';
+  $('fail1').onclick=()=>{stop();show(s2)};
+  $('fail2').onclick=()=>location.reload();
+}
+
+function stop(){
+  try{if(mindar){mindar.renderer.setAnimationLoop(null);mindar.stop()}}catch(e){}
+  mindar=null;CL=[];posed=false;clearTimeout(poseT);
+  arEl.classList.remove('on');
+  hint.classList.remove('gone');done.classList.remove('show');
+  load.hidden=true;
+}
+
+$('go').onclick=start;
+$('arx').onclick=()=>{stop();show(s1)};
+addEventListener('pagehide',stop);
+</script>
+</body>
+</html>
