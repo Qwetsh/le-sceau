@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#05080F">
-<title>NORDLYS</title>
+<title>LE SEUIL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Cinzel:wght@700&family=Noto+Sans+Runic&family=Source+Serif+4:ital@1&display=swap" rel="stylesheet">
@@ -500,9 +500,6 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 .cqrb.wait::before,.cqrb.wait::after{display:none}
 .cqrt{font-family:'Source Serif 4',serif;font-style:italic;font-size:14px;line-height:1.5;color:#9AA9BC}
 .cqrt b{display:block;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:10px;letter-spacing:.26em;color:#5EE0A0;margin-bottom:7px}
-.cqru{font-family:'JetBrains Mono',monospace;font-style:normal;font-size:9.5px;color:#3E4E66;word-break:break-all;margin-top:8px;display:block;line-height:1.4}
-.cqru a{color:#3E4E66}
-.cqru a:hover{color:#9AA9BC}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes spinr{to{transform:rotate(-360deg)}}
 @media (prefers-reduced-motion:reduce){
@@ -549,7 +546,7 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
       <div class="csceau"><div class="csg"></div><img src="assets/sceau-cire.webp" alt="Le sceau de cire du faire-part"></div>
       <div class="cqr">
         <div class="cqrw"><div class="cqrb wait" id="cqrb"></div></div>
-        <div class="cqrt"><b>SCANNEZ CE SCEAU</b>Visez cette marque avec l'appareil photo de votre téléphone, le carton à portée de main.<span class="cqru" id="cqru"></span></div>
+        <div class="cqrt"><b>SCANNEZ CE SCEAU</b></div>
       </div>
       <div class="cwrap">
         <div class="crow show"><input id="cin" maxlength="12" placeholder="·····" autocomplete="off" spellcheck="false"><button id="cgo">GRAVER</button></div>
@@ -589,7 +586,7 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
       <button class="mval" id="mval">VALIDER L'ÉPREUVE →</button>
     </div>
   </div>
-  <div class="title" id="title" aria-label="NORDLYS"></div>
+  <div class="title" id="title" aria-label="Le titre, en runes"></div>
   <div class="panel" id="panel">
     <div class="hint">Les runes du seuil disent un mot.</div>
     <div class="row"><input id="code" maxlength="12" placeholder="·······" autocomplete="off" spellcheck="false"><button id="go">OUVRIR</button></div>
@@ -651,9 +648,9 @@ const RL={'ᚠ':'F','ᚢ':'U','ᚦ':'TH','ᚨ':'A','ᚱ':'R','ᚲ':'K','ᚷ':'G'
 
 /* ---------- stockage ---------- */
 const storeg={
-  get(){try{return JSON.parse(localStorage.getItem('nordlys'))}catch(e){return null}},
-  set(v){try{localStorage.setItem('nordlys',JSON.stringify(v))}catch(e){}},
-  del(){try{localStorage.removeItem('nordlys')}catch(e){}},
+  get(){try{return JSON.parse(localStorage.getItem('skal2026'))}catch(e){return null}},
+  set(v){try{localStorage.setItem('skal2026',JSON.stringify(v))}catch(e){}},
+  del(){try{localStorage.removeItem('skal2026')}catch(e){}},
 };
 if(location.search.indexOf('reset')!==-1){storeg.del();history.replaceState(null,'',location.pathname)}
 let unlocked=false;
@@ -1309,9 +1306,8 @@ function qrSvg(q){
 
 function buildQR(){
   if(qrDone)return;qrDone=true;
-  const box=document.getElementById('cqrb'),url=new URL('ar.html',location.href).href,u=document.getElementById('cqru');
-  const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.textContent=url;
-  u.appendChild(a);
+  /* l'adresse n'est plus écrite sous le code : elle nommait le seuil */
+  const box=document.getElementById('cqrb'),url=new URL('ar.html',location.href).href;
   if(location.protocol==='file:'){box.textContent='SERVEZ LE SITE EN HTTPS POUR LE CODE';return}
   const s=document.createElement('script');
   s.src='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
@@ -1322,9 +1318,9 @@ function buildQR(){
       const q=qrcode(0,'Q');q.addData(url);q.make();
       box.innerHTML=qrSvg(q);
       box.classList.remove('wait');
-    }catch(e){box.textContent='CODE INDISPONIBLE · SUIVEZ LE LIEN'}
+    }catch(e){box.textContent='CODE INDISPONIBLE'}
   };
-  s.onerror=()=>{box.textContent='CODE INDISPONIBLE · SUIVEZ LE LIEN'};
+  s.onerror=()=>{box.textContent='CODE INDISPONIBLE'};
   document.head.appendChild(s);
 }
 function syncCire(){
@@ -1463,7 +1459,7 @@ buildGeo();buildArt();
    Le réglage a sa propre clé de stockage : « rejouer » remet le jeu à zéro,
    pas le choix du joueur d'entendre ou non le vent. */
 {
-  const amb=document.getElementById('amb'),btn=document.getElementById('snd'),KEY='nordlys.son';
+  const amb=document.getElementById('amb'),btn=document.getElementById('snd'),KEY='skal2026.son';
   /* Les pistes sont d'origines très diverses (les premières plafonnent vers
      -25 dBFS, celles du pack SFX vers -5) : ces gains les ramènent au même plan
      sonore. TAIL éteint la fin d'un coup, qui sinon se coupe net ; CUT écourte
