@@ -162,7 +162,7 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 .menu.open.drakkar .plaque{opacity:1;transform:none;transition-delay:.78s}
 .plaque img{display:block;width:100%;filter:drop-shadow(0 18px 40px rgba(0,0,0,.6))}
 .pgrid{position:absolute;left:16.1%;top:17.3%;width:67.8%;height:49.6%;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(4,1fr);gap:1.35%}
-.pslots{position:absolute;left:19.6%;top:70.2%;width:61.2%;height:11.6%;display:grid;grid-template-columns:repeat(4,1fr);gap:5.4%}
+.pslots{position:absolute;left:16.1%;top:71.6%;width:67.8%;height:10.1%;display:grid;grid-template-columns:repeat(6,1fr);gap:1.35%}
 .pc{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .pgl{position:absolute;inset:0;border-radius:4px;background:radial-gradient(ellipse at center,rgba(94,224,160,.32),rgba(94,224,160,.06) 58%,transparent 74%);opacity:0;transition:opacity .3s ease}
 .pc:hover .pgl{opacity:1}
@@ -171,9 +171,6 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 .pr{font-family:'Noto Sans Runic',sans-serif;font-size:23px;line-height:1;color:#3E7F72;text-shadow:0 1px 0 rgba(0,0,0,.8);transition:color .3s ease,text-shadow .3s ease,transform .4s cubic-bezier(.2,.8,.2,1);animation:pulseR 5s ease-in-out infinite}
 @keyframes pulseR{0%,100%{opacity:.72}50%{opacity:1}}
 .pc:hover .pr{color:#E9FFF6;text-shadow:0 0 10px #5EE0A0,0 0 26px rgba(94,224,160,.8);transform:scale(1.16)}
-.pc.used{cursor:default}
-.pc.used .pgl{opacity:0!important}
-.pc.used .pr{color:#1C2C42;text-shadow:none;animation:none;transform:scale(.86)}
 .pfl{position:absolute;inset:-8%;border-radius:5px;background:radial-gradient(circle,rgba(233,239,243,.9),rgba(94,224,160,.4) 40%,transparent 70%);opacity:0;pointer-events:none}
 .pc.hit .pfl{animation:hit .55s ease-out}
 @keyframes hit{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.5)}}
@@ -439,7 +436,7 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 const SALT='SKAL2026:';
 const HASH={
   seuil:'5168bd2d7c806d4698f9e9d5756dfa6caa10e998dbe337a7a90a3c8ae4b93f83',
-  plaque:'09bbd3803538107fc03bf469c76f45513a4466f2532919f454bed559ce5f1690',
+  plaque:'4158db47d237f0b8442940d8f666b0a003af3d27d714d6005bcc84584b9fe334',
   jour:'e2dac7abeabb21aa2caaba45bcbbbe26d5630efd14c6ef70498852de088ce506', // 'J<jour>M<mois>', mois de 1 à 12 sans zéro devant
   noms:['af461a826cf4526edfb4c7bbe2799285392d3284b582291917fefccbe0c145ac',
         '9fb4468968a675e4f5e6a84bd033c40058f9617856d0b84db99096ae26ce5366'], // les deux ordres acceptés
@@ -675,7 +672,7 @@ document.getElementById('mval').onclick=async()=>{
   const i=sel;if(typeof i!=='number'||solved.has(i))return;
   if(i===0){
     const full=PS.filter(x=>x.classList.contains('full'));
-    if(full.length<4)return;
+    if(full.length<PS.length)return;
     const word=full.map(x=>RL[x.dataset.r]||'').join('');
     if(!(await checkv(word,HASH.plaque))){reject();return}
   }
@@ -712,8 +709,8 @@ function pfly(from,to,ch){
 function syncVal(){
   if(!menu.classList.contains('drakkar'))return;
   const n=PS.filter(x=>x.classList.contains('full')).length,v=document.getElementById('mval');
-  v.disabled=n<4||solved.has(0);
-  v.textContent=solved.has(0)?'ÉPREUVE VALIDÉE':(n<4?'PLACEZ QUATRE RUNES':"VALIDER L'ÉPREUVE →");
+  v.disabled=n<PS.length||solved.has(0);
+  v.textContent=solved.has(0)?'ÉPREUVE VALIDÉE':(n<PS.length?'PLACEZ SIX RUNES':"VALIDER L'ÉPREUVE →");
 }
 function buildPlaque(){
   if(pBuilt)return;pBuilt=true;
@@ -721,20 +718,24 @@ function buildPlaque(){
   RUNES.forEach((r,i)=>{const c=document.createElement('div');c.className='pc';c.dataset.r=r;
     c.innerHTML=`<div class="pgl"></div><div class="prg" style="animation-duration:${11+i%5*3}s;animation-direction:${i%2?'reverse':'normal'}"></div><div class="pfl"></div><span class="pr" style="animation-delay:${(i*370)%5000}ms">${r}</span>`;
     g.appendChild(c)});
-  for(let i=0;i<4;i++){const x=document.createElement('div');x.className='ps';x.innerHTML='<div class="psg"></div><span class="psr"></span><div class="pdash"></div>';s.appendChild(x)}
+  for(let i=0;i<6;i++){const x=document.createElement('div');x.className='ps';x.innerHTML='<div class="psg"></div><span class="psr"></span><div class="pdash"></div>';s.appendChild(x)}
   PS=[...s.children];
   g.addEventListener('click',e=>{
-    const c=e.target.closest('.pc');if(!c||c.classList.contains('used')||solved.has(0))return;
-    const sl=PS.find(x=>!x.classList.contains('full'));if(!sl)return;
-    c.classList.add('used','hit');setTimeout(()=>c.classList.remove('hit'),600);
+    // la grille reste un clavier : une même rune peut servir deux fois dans un mot
+    const c=e.target.closest('.pc');if(!c||solved.has(0))return;
+    // l'emplacement est réservé dès le clic : six runes cliquées coup sur coup
+    // ne s'entassent pas dans la même case le temps que la rune vole.
+    const sl=PS.find(x=>!x.classList.contains('full')&&!x.dataset.busy);if(!sl)return;
+    sl.dataset.busy='1';
+    c.classList.add('hit');setTimeout(()=>c.classList.remove('hit'),600);
     pfly(c.querySelector('.pr'),sl,c.dataset.r);
-    setTimeout(()=>{sl.classList.add('full');sl.dataset.r=c.dataset.r;sl.dataset.src=[...g.children].indexOf(c);sl.querySelector('.psr').textContent=c.dataset.r;syncVal()},460);
+    setTimeout(()=>{delete sl.dataset.busy;sl.classList.add('full');sl.dataset.r=c.dataset.r;sl.dataset.src=[...g.children].indexOf(c);sl.querySelector('.psr').textContent=c.dataset.r;syncVal()},460);
   });
   s.addEventListener('click',e=>{
     const sl=e.target.closest('.ps');if(!sl||!sl.classList.contains('full')||solved.has(0))return;
     const c=g.children[sl.dataset.src];
     sl.classList.remove('full');sl.querySelector('.psr').textContent='';
-    if(c){pfly(sl,c.querySelector('.pr'),c.dataset.r);setTimeout(()=>c.classList.remove('used'),380)}
+    if(c)pfly(sl,c.querySelector('.pr'),c.dataset.r);
     syncVal();
   });
 }
@@ -748,7 +749,7 @@ function reject(){
     PS.forEach(s=>{
       if(!s.classList.contains('full'))return;
       const c=g.children[s.dataset.src];
-      if(c){pfly(s,c.querySelector('.pr'),s.dataset.r);setTimeout(()=>c.classList.remove('used'),380)}
+      if(c)pfly(s,c.querySelector('.pr'),s.dataset.r);
       s.classList.remove('full','bad');s.querySelector('.psr').textContent='';
     });
     syncVal();
