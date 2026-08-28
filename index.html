@@ -7,8 +7,16 @@
 <title>LE SEUIL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Cinzel:wght@700&family=Noto+Sans+Runic&family=Source+Serif+4:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Cinzel:wght@700&family=Source+Serif+4:ital@1&display=swap" rel="stylesheet">
 <style>
+/* La police runique est servie AVEC le site, pas par Google : tout le jeu est
+   écrit en runes, et macOS comme iOS n'ont aucun repli pour le bloc U+16A0.
+   Une coupure réseau le jour J transformerait le jeu en carrés vides.
+   Noto Sans Runic, sous-ensemble runique (6,4 ko), licence SIL OFL 1.1.
+   Les trois polices latines, elles, peuvent rester chez Google : leur repli
+   (monospace / serif) reste lisible. */
+@font-face{font-family:'Noto Sans Runic';font-style:normal;font-weight:400;font-display:swap;
+  src:url(assets/noto-sans-runic.woff2) format('woff2');unicode-range:U+16A0-16F8}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:#05080F;font-family:'JetBrains Mono',monospace;overflow:hidden}
@@ -52,7 +60,8 @@ svg.full{position:absolute;inset:0;width:100%;height:100%;display:block;overflow
 .bloom{position:absolute;left:50%;top:400px;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(233,239,243,.85),rgba(94,224,160,.35) 34%,transparent 70%);animation:bloom 1.4s ease-out forwards;pointer-events:none}
 @keyframes bloom{0%{transform:scale(.15);opacity:1}100%{transform:scale(1.9);opacity:0}}
 /* le titre : sept runes au seuil, sept lettres une fois le mot dit.
-   Tant que le seuil tient, le nom du jeu ne doit pas donner le mot de passe. */
+   Tant que le seuil tient, les lettres ne sont pas dans la page (cf. plus bas,
+   « le titre ») : ces règles ne servent qu'une fois le mot dit. */
 .title{position:absolute;top:30px;left:0;right:0;display:flex;justify-content:center;gap:.34em;color:#9AA9BC}
 .on .title{color:#E9EFF3;gap:.5em}
 .tg{position:relative;display:inline-grid;place-items:center;line-height:1}
@@ -110,6 +119,18 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 .hleft{font-size:10px;letter-spacing:.24em;color:#5EE0A0;opacity:.7;margin-bottom:28px}
 .hgo{font-size:10px;padding:12px 20px}
 @media (prefers-reduced-motion:reduce){.hcard{transition:opacity .4s ease;transform:none}}
+/* l'avertissement d'écran étroit : même carte, mais toujours visible tant
+   qu'on ne l'a pas écartée, et au-dessus de tout le reste */
+.tight{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:18px;
+  background:radial-gradient(ellipse at center,rgba(5,10,20,.82),rgba(3,6,14,.95))}
+.tight[hidden]{display:none}
+.tight .hcard{width:min(460px,94vw);padding:30px 26px 26px;transform:none;opacity:1}
+.tight .hcard h2{font-size:22px;margin:10px 0 14px}
+.tight .htxt{font-size:15px;max-width:none}
+.tight .htxt+.htxt{margin-top:12px}
+.tight .hgo{margin-top:22px}
+/* le crédit est calé sur la scène de 1280 : au-delà du viewport, il est rogné */
+.stage.narrow .credit{display:none}
 /* l'ambiance sonore : cinq barres d'aurore qui respirent tant que le son coule */
 .snd{position:fixed;right:26px;bottom:70px;z-index:40;width:42px;height:42px;padding:0;display:grid;place-items:center;border-radius:50%;border:1px solid #22304D;background:rgba(7,12,22,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);cursor:pointer;transition:border-color .5s ease,box-shadow .5s ease,background .35s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
 .snd:hover{background:rgba(94,224,160,.1);border-color:rgba(94,224,160,.75);box-shadow:0 0 22px rgba(94,224,160,.28);transform:scale(1.06)}
@@ -382,23 +403,28 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 .anneau.bad .dnum,.anneau.bad .dmon{color:#FFE2E2;text-shadow:0 0 16px #F08A8A,0 0 40px rgba(240,138,138,.7)}
 .anneau.done .aseg{cursor:default;pointer-events:none}
 .stage.zoomed .status{opacity:0!important}
-.menu.final{width:840px;height:430px;top:356px}
+.menu.final{width:840px;height:406px;top:356px}
 .menu.final .mrows{display:none}
 .menu.final .mh,.menu.final .mc{stroke:#E4B15E;filter:drop-shadow(0 0 10px rgba(228,177,94,.85))}
 .menu.final .mv{stroke:#4A3A22}
 .menu.final .mbg{background:rgba(22,16,8,.74);box-shadow:0 0 90px rgba(228,177,94,.15) inset,0 30px 90px rgba(0,0,0,.6)}
 .menu.final .mkick{color:#E4B15E}
-.menu.final .minner{padding:34px 54px}
-.menu.final .minner h2{font-size:40px;color:#FFF3D6;text-shadow:0 0 34px rgba(228,177,94,.55);margin:8px 0 14px}
+.menu.final .minner{padding:28px 54px 24px}
+.menu.final .minner h2{font-size:38px;color:#FFF3D6;text-shadow:0 0 34px rgba(228,177,94,.55);margin:6px 0 10px}
 .menu.final .msweep{background:linear-gradient(90deg,transparent,rgba(255,243,214,.2),transparent)}
 .menu.final .mval{display:none}
 .menu.final .mnote{display:none}
 #mfinal{display:none}
-.menu.final #mfinal{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.menu.final #mfinal{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
 .menu.open.final #mfinal{opacity:1;transform:none;transition-delay:.95s}
-.famount{font-family:'Cinzel',serif;font-size:56px;color:#E4B15E;text-shadow:0 0 30px rgba(228,177,94,.6);letter-spacing:.08em}
+.famount{font-family:'Cinzel',serif;font-size:50px;color:#E4B15E;text-shadow:0 0 30px rgba(228,177,94,.6);letter-spacing:.08em}
 .ftext{font-family:'Source Serif 4',serif;font-style:italic;font-size:16px;line-height:1.5;color:#D8CBB0;margin:0;max-width:560px}
 .ftext.em{color:#FFF3D6}
+/* la dernière ligne nomme qui détient l'enveloppe : sans elle, le jeu se
+   terminait sur une devinette de plus */
+.ftext.who{font-size:15px;color:#C9B994}
+.ftext.who b{font-family:'JetBrains Mono',monospace;font-style:normal;font-weight:400;font-size:12px;
+  letter-spacing:.16em;color:#E4B15E;white-space:nowrap}
 .frunes{font-family:'Noto Sans Runic',sans-serif;font-size:24px;color:#E4B15E;text-shadow:0 0 14px rgba(228,177,94,.8);margin-top:6px}
 .frl{font-size:9px;letter-spacing:.34em;color:#9AA9BC}
 .prompt{position:absolute;left:50%;top:548px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px;font-size:10px;letter-spacing:.34em;color:#E4B15E;opacity:0;pointer-events:none;transition:opacity 1s ease}
@@ -498,6 +524,9 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 .cqrw::after{left:-13px;bottom:-13px;border-right:0;border-top:0}
 .menu.cire .cqrw{margin:4px 0 2px}
 .cqrb.wait::before,.cqrb.wait::after{display:none}
+/* le repli, quand la trame ne peut pas être calculée */
+.cqrf{padding:16px;font-family:'Source Serif 4',serif;font-style:italic;font-size:13.5px;line-height:1.5;color:#9AA9BC;text-align:center}
+.cqrf b{display:block;margin-top:10px;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:10px;letter-spacing:.02em;color:#5EE0A0;word-break:break-all}
 .cqrt{font-family:'Source Serif 4',serif;font-style:italic;font-size:14px;line-height:1.5;color:#9AA9BC}
 .cqrt b{display:block;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:10px;letter-spacing:.26em;color:#5EE0A0;margin-bottom:7px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -578,6 +607,7 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
         <div class="famount" id="famount">0&nbsp;€</div>
         <p class="ftext">Pour les frais de traversée. Ou de bière norvégienne, qui coûte à peu près pareil.</p>
         <p class="ftext em">Votre cadeau ne voyage pas encore. Il dort sous mon nom, derrière une porte de fer, là où les sonneries rythment nos journées.</p>
+        <p class="ftext who">Clément, tu passes devant chaque matin. <b>Demande la clé à Thomas.</b></p>
         <div class="frunes">ᚷᛟᛞ ᚱᛖᛁᛊᛖ</div>
         <div class="frl">GOD REISE · BON VOYAGE</div>
       </div>
@@ -614,6 +644,22 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
   </div>
 </div>
 
+<!-- Écran trop étroit. La scène est un tableau de 1280×800 mis à l'échelle : sous
+     ~600 px de large, les consignes tombent à 6 px. On ne peut pas y remédier sans
+     refondre les cinq panneaux ; on le dit, et on laisse passer qui insiste. -->
+<div class="tight" id="tight" hidden>
+  <div class="hcard">
+    <i class="hq k1"></i><i class="hq k2"></i><i class="hq k3"></i><i class="hq k4"></i>
+    <div class="hkick">LE SEUIL</div>
+    <h2>TROP ÉTROIT</h2>
+    <p class="htxt">Ce cercle a été gravé pour un grand écran. Ici, les runes tiennent
+      dans un grain de sable.</p>
+    <p class="htxt">Tournez l’appareil, ou rejoignez un ordinateur. Le téléphone, lui,
+      ne sert qu’à scanner le sceau de la cinquième épreuve.</p>
+    <button class="hgo" id="tgo" type="button">CONTINUER QUAND MÊME</button>
+  </div>
+</div>
+
 <!-- moteur de repli : ne sert que si Web Audio est indisponible, d'où preload="none" -->
 <audio id="amb" src="assets/ambiance.mp3" loop preload="none"></audio>
 <button class="snd" id="snd" type="button" aria-pressed="false" title="Rétablir le son">
@@ -630,20 +676,33 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 <script>
 'use strict';
 
-/* ---------- réponses (SHA-256 salées, jamais en clair) ---------- */
-const SALT='SKAL2026:';
+/* ---------- réponses (dérivées, jamais en clair) ----------
+   Un SHA-256 simple se retourne : le sel est forcément ici, à côté, et les
+   réponses tiennent en cinq à sept lettres — un dictionnaire suffisait à
+   toutes les retrouver en quelques minutes. On passe donc par PBKDF2, dont
+   les 150 000 tours coûtent ~200 ms au joueur (une fois, au clic) et des
+   semaines à qui voudrait balayer un dictionnaire. */
+const SALT='SKAL2026:',ITER=150000;
 const HASH={
-  seuil:'5168bd2d7c806d4698f9e9d5756dfa6caa10e998dbe337a7a90a3c8ae4b93f83',
-  plaque:'4158db47d237f0b8442940d8f666b0a003af3d27d714d6005bcc84584b9fe334',
-  jour:'e2dac7abeabb21aa2caaba45bcbbbe26d5630efd14c6ef70498852de088ce506', // 'J<jour>M<mois>', mois de 1 à 12 sans zéro devant
-  noms:['af461a826cf4526edfb4c7bbe2799285392d3284b582291917fefccbe0c145ac',
-        '9fb4468968a675e4f5e6a84bd033c40058f9617856d0b84db99096ae26ce5366'], // les deux ordres acceptés
-  cire:'c02ec406fa5bb68d512aa051b548c1b34ba582a93a9914e58229ad975f93f5b3',
-  route:'bd771fce828d206800711c02da0c994537d88bfe40e0347deaa01387b05d4b50', // les six escales, de la première à la dernière
+  seuil:'760dd050dee1c62e97c1ad6423b4d0bd5e406043091abba57e26704c54b4c5ac',
+  plaque:'6e8e38ed1fc35c76aae4e5237f3ae001a8e007fb639a5f4eaed244ab60f0103a',
+  jour:'c1beec64afb6404d7ed4a607287ce4d21af2f7d2e0c009d3804ef5c3529fdb8c', // 'J<jour>M<mois>', mois de 1 à 12 sans zéro devant
+  noms:['65611e2f05e6ae4c4ac0ba877062660755395e1524cdc3c97f9baaa687fac6dd',
+        'c55833056a186621762764a532ebb45678b07c0eab5bde7c142afa5822b73a5b'], // les deux ordres acceptés
+  cire:'0d756b12c62f20f2a9ad7098d6790500be88d5dde48cef8251084e4cd25001e1',
+  route:'07bb6e78c72f204481a43bbe0aacb6b2106876599e2038e41a86bce9f4249783', // les six escales, de la première à la dernière
 };
 function normv(s){return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
-async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-async function checkv(v,h){return(await sha(SALT+normv(v)))===h}
+/* WebCrypto n'existe qu'en contexte sûr : ouvert en file:// ou servi en http://,
+   il manque, et sans ce garde-fou toute validation échouait sans un mot. */
+const CRYPTO_OK=!!(window.crypto&&crypto.subtle&&crypto.subtle.deriveBits);
+async function derive(s){
+  const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(s),'PBKDF2',false,['deriveBits']);
+  const b=await crypto.subtle.deriveBits(
+    {name:'PBKDF2',salt:new TextEncoder().encode(SALT),iterations:ITER,hash:'SHA-256'},k,256);
+  return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+async function checkv(v,h){return(await derive(normv(v)))===h}
 const RL={'ᚠ':'F','ᚢ':'U','ᚦ':'TH','ᚨ':'A','ᚱ':'R','ᚲ':'K','ᚷ':'G','ᚹ':'W','ᚺ':'H','ᚾ':'N','ᛁ':'I','ᛃ':'J','ᛇ':'Y','ᛈ':'P','ᛉ':'Z','ᛊ':'S','ᛏ':'T','ᛒ':'B','ᛖ':'E','ᛗ':'M','ᛚ':'L','ᛜ':'NG','ᛞ':'D','ᛟ':'O','ᛦ':'YR'};
 
 /* ---------- stockage ---------- */
@@ -667,8 +726,21 @@ function fit(){
   SCALE=Math.min(innerWidth/Math.min(1280,need),innerHeight/800);
   const t=`scale(${SCALE})`;
   fitA.style.transform=t;fitB.style.transform=t;
+  etroit();
 }
-addEventListener('resize',fit);fit();
+/* Sous 0,55, les consignes des panneaux passent sous 9 px : plus personne ne
+   les lit. On ne barre pas la route — on prévient, une fois. */
+// `stage` n'est déclaré que plus bas, et fit() court dès maintenant : on va
+// chercher les deux éléments à chaque passage plutôt que d'avancer la déclaration
+let etroitEcarte=false;
+function etroit(){
+  const serre=SCALE<.55,s=document.getElementById('stage'),t=document.getElementById('tight');
+  if(s)s.classList.toggle('narrow',serre);
+  if(t)t.hidden=etroitEcarte||!serre;
+}
+addEventListener('resize',fit);
+addEventListener('orientationchange',fit);
+fit();
 
 /* ---------- scène ---------- */
 const CX=640,CY=400,P=Math.PI/180,pt=(r,a)=>[CX+r*Math.cos(a*P),CY+r*Math.sin(a*P)];
@@ -762,14 +834,49 @@ function pop(cls){const d=document.createElement('div');d.className=cls;fitB.app
 let sfx=()=>{};   // renseigné par le bloc « le son », plus bas
 
 /* ---------- le titre ----------
-   Chaque lettre du nom est une case superposant sa rune et sa lettre latine :
-   au seuil, seule la rune se voit — le nom du jeu ne trahit donc pas le mot à
-   dire. Une fois le seuil franchi, les runes se dissolvent une à une et les
-   lettres montent à leur place. */
-const TITRE=[['ᚾ','N'],['ᛟ','O'],['ᚱ','R'],['ᛞ','D'],['ᛚ','L'],['ᛇ','Y'],['ᛊ','S']],
+   Chaque lettre du nom est une case qui superposera sa rune et sa lettre
+   latine. Au seuil, la case ne contient QUE la rune : la lettre n'existe ni
+   dans la page (un « tout sélectionner » la donnerait, sans même ouvrir les
+   outils de développement) ni en clair dans ce fichier. Elle est dérivée de
+   la rune affichée, par la table de l'épreuve 01, et greffée seulement quand
+   le mot est dit. Les runes se dissolvent alors une à une et les lettres
+   montent à leur place ; « rejouer » les arrache et rescelle le seuil. */
+const TITRE='ᚾᛟᚱᛞᛚᛇᛊ'.split(''),
       titleEl=document.getElementById('title');
-titleEl.innerHTML=TITRE.map(([r,l])=>`<span class="tg" aria-hidden="true"><i class="rn">${r}</i><i class="lt">${l}</i></span>`).join('');
+titleEl.innerHTML=TITRE.map(r=>`<span class="tg" aria-hidden="true"><i class="rn">${r}</i></span>`).join('');
+/* Une lettre latine est plus large que sa rune : greffée telle quelle, elle
+   ferait bondir le titre de 22 % au moment du déverrouillage. On mesure donc
+   les cases finales une fois pour toutes, dans un fantôme monté et démonté
+   hors écran dans la même frame — rien n'entre durablement dans la page — et
+   on fige la largeur obtenue. Le fantôme vit hors de .fit : ses largeurs sont
+   donc en pixels CSS bruts, comme min-width, et survivent aux changements
+   d'échelle. À faire une fois les polices prêtes, sinon on mesure le repli. */
+function reserve(){
+  const f=document.createElement('div');
+  f.className='title';
+  f.style.cssText='position:absolute;left:-9999px;right:auto;top:0;width:auto;visibility:hidden';
+  f.innerHTML=TITRE.map(r=>`<span class="tg"><i class="rn">${r}</i>`+
+    `<i class="lt" style="opacity:1;transform:none;filter:none">${RL[r]||''}</i></span>`).join('');
+  document.body.appendChild(f);
+  const w=[...f.querySelectorAll('.tg')].map(g=>g.getBoundingClientRect().width);
+  f.remove();
+  titleEl.querySelectorAll('.tg').forEach((g,k)=>{if(w[k])g.style.minWidth=w[k].toFixed(2)+'px'});
+}
+try{document.fonts.ready.then(reserve)}catch(e){reserve()}
+
+// les sept lettres arrivent d'un coup, avant la première bascule : la largeur
+// des cases est déjà réservée, rien ne bouge quand elles montent
+function greffe(){
+  titleEl.querySelectorAll('.tg').forEach(g=>{
+    if(g.querySelector('.lt'))return;
+    const i=document.createElement('i');
+    i.className='lt';i.textContent=RL[g.querySelector('.rn').textContent]||'';
+    g.appendChild(i);
+  });
+  void titleEl.offsetWidth;
+}
 function titreLettres(instant){
+  greffe();
   const gs=titleEl.querySelectorAll('.tg');
   if(instant){titleEl.classList.add('instant');gs.forEach(g=>g.classList.add('mo'));return}
   titleEl.classList.remove('instant');
@@ -777,7 +884,10 @@ function titreLettres(instant){
 }
 function titreRunes(){
   titleEl.classList.add('instant');
-  titleEl.querySelectorAll('.tg').forEach(g=>g.classList.remove('mo'));
+  titleEl.querySelectorAll('.tg').forEach(g=>{
+    g.classList.remove('mo');
+    const l=g.querySelector('.lt');if(l)l.remove();
+  });
 }
 
 function unlock(){
@@ -849,18 +959,67 @@ function reset(){
   closeMenu();
   document.querySelector('.status').textContent=STATUS;
   const c=document.getElementById('code');c.value='';c.classList.remove('bad');
+  /* Les cinq épreuves se remettent à zéro elles aussi : sans ça, la plaque
+     gardait ses six runes et la fente ses six escales — la partie « rejouée »
+     s'ouvrait donc sur des réponses déjà posées, revalidables d'un clic. */
+  if(pBuilt){
+    PS.forEach(s=>{s.classList.remove('full','bad');s.querySelector('.psr').textContent='';
+      delete s.dataset.r;delete s.dataset.src});
+    document.getElementById('plaque').classList.remove('bad');
+  }
+  if(rBuilt){
+    NOT.forEach(n=>{rclear(n);n.classList.remove('next');delete n.dataset.busy});
+    MED.forEach(d=>d.classList.remove('gone'));
+    document.getElementById('fente').classList.remove('win','bad');
+  }
   if(nBuilt){NS.forEach(nclear);document.getElementById('noms').classList.remove('win','bad')}
   if(aBuilt){selM=selD=null;arm.style.transform='rotate(0deg)';ard.style.transform='rotate(0deg)';
-    document.getElementById('astro').querySelectorAll('.aon').forEach(x=>x.classList.remove('aon'))}
+    document.getElementById('astro').querySelectorAll('.aon').forEach(x=>x.classList.remove('aon'));
+    document.getElementById('anneau').classList.remove('full','bad','done')}
+  CIN.value='';CIN.disabled=false;CIN.classList.remove('bad');
+  CERR.classList.remove('show');
+  const g=document.getElementById('cgo');g.disabled=false;g.textContent='GRAVER';
   buildGeo();buildArt();
 }
 const input=document.getElementById('code');
+/* Une vérification coûte maintenant ~200 ms. Sans verrou, deux clics rapprochés
+   la lancent deux fois et l'épreuve se valide en double : deux éclats, deux
+   sons, et le final joué deux fois sur la cinquième. Le verrou est global :
+   il n'y a jamais qu'une seule réponse en cours de vérification. */
+let checking=false;
+async function tenter(f){
+  if(checking)return;
+  checking=true;document.body.style.cursor='progress';
+  try{return await f()}
+  catch(e){panne();return null}
+  finally{checking=false;document.body.style.cursor=''}
+}
+/* Le contexte n'est pas sûr, ou WebCrypto a cédé : on le dit dans le ton du
+   jeu plutôt que de laisser la saisie retomber dans le vide. */
+function panne(){
+  const m=document.getElementById('perr'),c=document.getElementById('cerr');
+  if(menu.classList.contains('open')){
+    if(menu.classList.contains('cire')){c.textContent='Les runes ne répondent plus. Rechargez la page.';c.classList.add('show')}
+    else{m.textContent='LES RUNES NE RÉPONDENT PLUS · RECHARGEZ LA PAGE';m.classList.add('show')}
+  }else{
+    document.querySelector('.panel .hint').textContent='Les runes ne répondent plus. Rechargez la page.';
+  }
+}
 async function submit(){
-  if(await checkv(input.value,HASH.seuil)){unlocked=true;persist();unlock()}
-  else{sfx('echec');input.classList.add('bad');setTimeout(()=>input.classList.remove('bad'),700)}
+  await tenter(async()=>{
+    if(await checkv(input.value,HASH.seuil)){unlocked=true;persist();unlock()}
+    else{sfx('echec');input.classList.add('bad');setTimeout(()=>input.classList.remove('bad'),700)}
+  });
 }
 document.getElementById('go').onclick=submit;
 input.onkeydown=e=>{if(e.key==='Enter')submit()};
+/* Servi en http:// ou ouvert en file://, WebCrypto n'existe pas : le mot juste
+   serait refusé sans un mot d'explication. On coupe la saisie et on le dit. */
+if(!CRYPTO_OK){
+  document.querySelector('.panel .hint').textContent=
+    'Ce seuil ne s’ouvre qu’en ligne. Ouvrez le site depuis son adresse, pas depuis le fichier.';
+  input.disabled=true;document.getElementById('go').disabled=true;
+}
 document.getElementById('replay').onclick=reset;
 const STATUS=document.querySelector('.status').textContent;
 
@@ -892,9 +1051,12 @@ function finale(){
   document.querySelector('.status').textContent='LE SCEAU EST OUVERT';
 }
 
-/* ---------- validation d'une épreuve ---------- */
-document.getElementById('mval').onclick=async()=>{
-  const i=sel;if(typeof i!=='number'||solved.has(i))return;
+/* ---------- validation d'une épreuve ----------
+   L'épreuve 05 ne passe pas par ce bouton (elle se grave dans son champ) :
+   d'où le refus explicite, qui évite qu'elle tombe dans la validation finale
+   sans avoir été vérifiée si le bouton réapparaissait un jour. */
+document.getElementById('mval').onclick=()=>tenter(async()=>{
+  const i=sel;if(typeof i!=='number'||i===4||solved.has(i))return;
   if(i===0){
     const full=PS.filter(x=>x.classList.contains('full'));
     if(full.length<PS.length)return;
@@ -911,7 +1073,9 @@ document.getElementById('mval').onclick=async()=>{
   }
   if(i===2){
     const w=nword();
-    if(!(await Promise.all(HASH.noms.map(h=>checkv(w,h)))).some(Boolean)){rejectNoms();return}
+    let bon=false;
+    for(const h of HASH.noms)if(await checkv(w,h)){bon=true;break}
+    if(!bon){rejectNoms();return}
     solved.add(2);persist();
     document.getElementById('noms').classList.add('win');
     after(700,()=>{closeMenu();after(620,()=>validate(2))});
@@ -919,19 +1083,18 @@ document.getElementById('mval').onclick=async()=>{
   }
   if(i===3){
     if(selM===null||selD===null)return;
-    // tant que HASH.jour vaut null (date de départ pas encore scellée), toute date passe
-    if(HASH.jour&&!(await checkv('J'+selD+'M'+(selM+1),HASH.jour))){rejectJour();return}
+    if(!(await checkv('J'+selD+'M'+(selM+1),HASH.jour))){rejectJour();return}
   }
-  // épreuves 02-03 : énigmes en construction, validation directe temporaire
   solved.add(i);persist();
   closeMenu();after(620,()=>validate(i));
-};
+});
 
 /* ---------- la route (épreuve 02) ---------- */
-/* Les lieux ne sont jamais nommés à l'écran : les reconnaître est l'épreuve.
-   Cette liste est l'ordre où ils dérivent, pas celui de la route — celui-là
+/* Les lieux ne sont nommés NULLE PART : ni à l'écran, ni dans l'alt, ni dans le
+   nom du fichier — les reconnaître est l'épreuve, et l'onglet Réseau la donnait.
+   Ces six lettres sont l'ordre où ils dérivent, pas celui de la route : celui-là
    n'est nulle part, il dort dans HASH.route. */
-const LIEUX=['opera','vasa','elbphilharmonie','bryggen','poseidon','sirene'];
+const LIEUX=['a','b','c','d','e','f'];
 const RCH=['I','II','III','IV','V','VI'];
 let rBuilt=false,MED=[],NOT=[];
 function rfly(img,to,size){
@@ -1304,42 +1467,64 @@ function qrSvg(q){
     '<path d="'+d+'" fill="url(#qg)"/>'+e+em+'</svg>';
 }
 
+/* Le code est le SEUL chemin vers le nœud 05 : l'adresse n'est pas écrite sous
+   lui, elle nommait le seuil. La bibliothèque est donc servie avec le site, et
+   le CDN n'est plus qu'une roue de secours. Si les deux se taisent, on écrit
+   l'adresse : elle est déjà dans la barre du navigateur, elle ne trahit rien —
+   et sans elle l'épreuve deviendrait injouable. */
 function buildQR(){
   if(qrDone)return;qrDone=true;
-  /* l'adresse n'est plus écrite sous le code : elle nommait le seuil */
   const box=document.getElementById('cqrb'),url=new URL('ar.html',location.href).href;
-  if(location.protocol==='file:'){box.textContent='SERVEZ LE SITE EN HTTPS POUR LE CODE';return}
-  const s=document.createElement('script');
-  s.src='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
-  s.onload=()=>{
+  const dit=(txt,adr)=>{
+    box.classList.add('wait');
+    box.innerHTML='<div class="cqrf"></div>';
+    const d=box.firstChild;d.textContent=txt;
+    if(adr){const b=document.createElement('b');b.textContent=adr;d.appendChild(b)}
+  };
+  const grave=()=>{
     try{
       /* Q : de quoi couvrir l'emblème sans la densité de H, qui donnait des
          modules trop fins pour être lus de loin */
       const q=qrcode(0,'Q');q.addData(url);q.make();
-      box.innerHTML=qrSvg(q);
-      box.classList.remove('wait');
-    }catch(e){box.textContent='CODE INDISPONIBLE'}
+      box.innerHTML=qrSvg(q);box.classList.remove('wait');
+      return true;
+    }catch(e){return false}
   };
-  s.onerror=()=>{box.textContent='CODE INDISPONIBLE'};
-  document.head.appendChild(s);
+  // un code vers file:/// ne mènerait nulle part depuis un téléphone
+  if(location.protocol==='file:'){dit('Le sceau ne se grave qu’une fois le site en ligne.');return}
+  dit('Le sceau se grave…');
+  const charge=(src,suite)=>{
+    const s=document.createElement('script');
+    s.src=src;s.onload=()=>suite(false);s.onerror=()=>suite(true);
+    document.head.appendChild(s);
+  };
+  charge('assets/qrcode.js',rate=>{
+    if(!rate&&grave())return;
+    charge('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js',encore=>{
+      if(!encore&&grave())return;
+      dit('Le sceau refuse de se graver. Ouvrez cette adresse sur le téléphone :',url);
+    });
+  });
 }
 function syncCire(){
   const ok=solved.has(4),g=document.getElementById('cgo');
   CIN.value='';CIN.disabled=ok;g.disabled=ok;g.textContent=ok?'GRAVÉ':'GRAVER';
   CERR.classList.remove('show');
 }
-async function graver(){
+function graver(){
   if(solved.has(4)||!normv(CIN.value))return;
-  if(await checkv(CIN.value,HASH.cire)){
-    CERR.classList.remove('show');
-    solved.add(4);persist();
-    closeMenu();after(620,()=>validate(4));
-  }else{
-    sfx('echec');
-    CIN.classList.add('bad');setTimeout(()=>CIN.classList.remove('bad'),700);
-    CERR.textContent="Ce n'est pas ce que disent les lettres.";CERR.classList.add('show');
-    setTimeout(()=>CERR.classList.remove('show'),3600);
-  }
+  tenter(async()=>{
+    if(await checkv(CIN.value,HASH.cire)){
+      CERR.classList.remove('show');
+      solved.add(4);persist();
+      closeMenu();after(620,()=>validate(4));
+    }else{
+      sfx('echec');
+      CIN.classList.add('bad');setTimeout(()=>CIN.classList.remove('bad'),700);
+      CERR.textContent="Ce n'est pas ce que disent les lettres.";CERR.classList.add('show');
+      setTimeout(()=>CERR.classList.remove('show'),3600);
+    }
+  });
 }
 document.getElementById('cgo').onclick=graver;
 CIN.onkeydown=e=>{if(e.key==='Enter')graver()};
@@ -1438,6 +1623,7 @@ function closeMenu(){
   stage.classList.remove('zoomed');
 }
 document.getElementById('backzone').onclick=closeMenu;
+document.getElementById('tgo').onclick=()=>{etroitEcarte=true;etroit()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWait();closeMenu()}});
 
 /* ---------- démarrage ---------- */
