@@ -403,7 +403,7 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 .anneau.bad .dnum,.anneau.bad .dmon{color:#FFE2E2;text-shadow:0 0 16px #F08A8A,0 0 40px rgba(240,138,138,.7)}
 .anneau.done .aseg{cursor:default;pointer-events:none}
 .stage.zoomed .status{opacity:0!important}
-.menu.final{width:840px;height:406px;top:356px}
+.menu.final{width:840px;height:330px;top:394px}
 .menu.final .mrows{display:none}
 .menu.final .mh,.menu.final .mc{stroke:#E4B15E;filter:drop-shadow(0 0 10px rgba(228,177,94,.85))}
 .menu.final .mv{stroke:#4A3A22}
@@ -417,14 +417,8 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
 #mfinal{display:none}
 .menu.final #mfinal{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
 .menu.open.final #mfinal{opacity:1;transform:none;transition-delay:.95s}
-.famount{font-family:'Cinzel',serif;font-size:50px;color:#E4B15E;text-shadow:0 0 30px rgba(228,177,94,.6);letter-spacing:.08em}
 .ftext{font-family:'Source Serif 4',serif;font-style:italic;font-size:16px;line-height:1.5;color:#D8CBB0;margin:0;max-width:560px}
 .ftext.em{color:#FFF3D6}
-/* la dernière ligne nomme qui détient l'enveloppe : sans elle, le jeu se
-   terminait sur une devinette de plus */
-.ftext.who{font-size:15px;color:#C9B994}
-.ftext.who b{font-family:'JetBrains Mono',monospace;font-style:normal;font-weight:400;font-size:12px;
-  letter-spacing:.16em;color:#E4B15E;white-space:nowrap}
 .frunes{font-family:'Noto Sans Runic',sans-serif;font-size:24px;color:#E4B15E;text-shadow:0 0 14px rgba(228,177,94,.8);margin-top:6px}
 .frl{font-size:9px;letter-spacing:.34em;color:#9AA9BC}
 .prompt{position:absolute;left:50%;top:548px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px;font-size:10px;letter-spacing:.34em;color:#E4B15E;opacity:0;pointer-events:none;transition:opacity 1s ease}
@@ -604,10 +598,8 @@ button:hover{background:rgba(94,224,160,.12);box-shadow:0 0 20px rgba(94,224,160
         </div>
       </div>
       <div id="mfinal">
-        <div class="famount" id="famount">0&nbsp;€</div>
         <p class="ftext">Pour les frais de traversée. Ou de bière norvégienne, qui coûte à peu près pareil.</p>
-        <p class="ftext em">Votre cadeau ne voyage pas encore. Il dort sous mon nom, derrière une porte de fer, là où les sonneries rythment nos journées.</p>
-        <p class="ftext who">Clément, tu passes devant chaque matin. <b>Demande la clé à Thomas.</b></p>
+        <p class="ftext em">Votre cadeau ne voyage pas encore. Il dort sous mon nom, derrière une porte de bois, là où les sonneries rythment nos journées.</p>
         <div class="frunes">ᚷᛟᛞ ᚱᛖᛁᛊᛖ</div>
         <div class="frl">GOD REISE · BON VOYAGE</div>
       </div>
@@ -1602,16 +1594,6 @@ function openFinal(){
   document.getElementById('mkick').textContent='LE SCEAU EST OUVERT';
   document.getElementById('mtitle').textContent='SKÅL';
   mt.push(setTimeout(()=>menu.classList.add('open'),880));
-  const amt=document.getElementById('famount'),t0=performance.now();
-  mt.push(setTimeout(()=>{
-    (function tick(t){
-      const p=Math.min(1,(t-(t0+1100))/1500);
-      if(p<0){requestAnimationFrame(tick);return}
-      const e2=1-Math.pow(1-p,3);
-      amt.innerHTML=Math.round(e2*100)+'&nbsp;€';
-      if(p<1&&sel==='F')requestAnimationFrame(tick);
-    })(t0);
-  },200));
 }
 function closeMenu(){
   if(sel===null)return;sel=null;mt.forEach(clearTimeout);mt=[];
